@@ -1,55 +1,38 @@
-const mongoose = require('mongoose');
+const express = require('express');
+const bodyParser = require('body-parser');
 
-// conncet to mongdb
-// using promsise
-mongoose.Promise = global.Promise;
-mongoose.connect('mongodb://localhost:27017/TodoApp');
+const { mongoose } = require('./db/mongoose');
+const { Todo } = require('./models/todo');
+const { User } = require('./models/user');
 
-// save new something Model
-let Todo = mongoose.model('Todos', {
-  text: {
-    type: String
-  },
-  completed: {
-    type: Boolean
-  },
-  completedAt: {
-    type: Number
-  }
+// initialize the express
+const app = express();
+/*
+  -------------CRUD operation-------------
+  C = Create[POST request],
+  R = Read[GET request],
+  U = Update[POST request],
+  D = Delete[GET request]
+*/
+/* Creating Middleware */
+
+app.use(bodyParser.json());
+
+/* Creating Todos*/
+app.post('/todos', (req, res) => {
+  // send data to mongodb
+  let todo = new Todo({
+    text: req.body.text
+  });
+
+  todo.save().then((doc) => {
+    res.send(doc);
+  }, (e) => {
+    res.status(400).send(e);
+  });
+
 });
-
-// creating a new todos
-// let newTodo = new Todo({
-//   text: 'railway group d',
-//   completed: true,
-//   completedAt: 12
-// });
-
-// save to the database
-// newTodo.save().then((doc) => {
-//   console.log('Saved Todo.',doc);
-  
-// }, (e) => {
-//   console.log('Unable to save Todo',e);
-  
-// });
-
-// Create a todo
-let otherTodo = new Todo({
-  text: 'laura',
-  completed: true,
-  completedAt: 123
+// creating server
+app.listen(3000, () => {
+  console.log('Satarted on port 3000');
 });
-
-// Save to the Database
-otherTodo.save().then((doc) => {
-  console.log(JSON.stringify(doc, undefined, 2));
-  
-}, (e) => {
-  console.log('Unable to save todo',e);
-});
-
-
-
-
-
